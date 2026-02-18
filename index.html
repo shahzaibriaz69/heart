@@ -3,168 +3,123 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>For My Favorite Person</title>
+    <title>Building My Heart</title>
     <style>
-        :root {
-            --primary-color: #ff3366;
-            --secondary-color: #ff85a2;
-            --bg-dark: #0a0a0a;
-        }
-
         body {
             margin: 0;
-            padding: 0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: radial-gradient(circle at center, #1a0a0a 0%, var(--bg-dark) 100%);
-            font-family: 'Poppins', sans-serif;
+            background-color: #050505;
             overflow: hidden;
-            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Courier New', Courier, monospace;
         }
 
-        /* The Main Heart */
-        .heart-box {
-            position: relative;
-            cursor: pointer;
-            filter: drop-shadow(0 0 20px rgba(255, 51, 102, 0.5));
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        canvas {
+            display: block;
         }
 
-        .heart-box:hover {
-            transform: scale(1.1);
-        }
-
-        .heart {
-            background-color: var(--primary-color);
-            display: inline-block;
-            height: 100px;
-            position: relative;
-            top: 0;
-            transform: rotate(-45deg);
-            width: 100px;
-            background: linear-gradient(135deg, var(--primary-color) 0%, #b3002d 100%);
-            box-shadow: 0 0 40px rgba(255, 51, 102, 0.3);
-            animation: beat 1s infinite alternate;
-        }
-
-        .heart:before,
-        .heart:after {
-            content: "";
-            background: inherit;
-            border-radius: 50%;
-            height: 100px;
+        #message {
             position: absolute;
-            width: 100px;
-        }
-
-        .heart:before {
-            top: -50px;
-            left: 0;
-        }
-
-        .heart:after {
-            left: 50px;
-            top: 0;
-        }
-
-        @keyframes beat {
-            to {
-                transform: scale(1.1) rotate(-45deg);
-            }
-        }
-
-        /* Floating Particles */
-        .particle {
-            position: absolute;
-            pointer-events: none;
-            color: var(--secondary-color);
-            font-size: 20px;
-            animation: float 3s forwards ease-out;
-            z-index: 10;
-        }
-
-        @keyframes float {
-            0% {
-                transform: translateY(0) scale(1);
-                opacity: 1;
-            }
-
-            100% {
-                transform: translateY(-200px) translateX(calc(-50px + 100px * var(--rand))) scale(0);
-                opacity: 0;
-            }
-        }
-
-        /* Text Content */
-        .content {
-            margin-top: 100px;
-            text-align: center;
+            bottom: 10%;
+            color: #ff3366;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            font-size: 14px;
             opacity: 0;
-            transform: translateY(20px);
-            transition: all 1s ease;
-        }
-
-        .content.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            background: linear-gradient(to right, #fff, var(--secondary-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        p {
-            font-size: 1.1rem;
-            color: #aaa;
-            max-width: 300px;
-            line-height: 1.6;
+            transition: opacity 2s;
+            text-shadow: 0 0 10px #ff3366;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="heart-box" onclick="burst(event)">
-        <div class="heart"></div>
-    </div>
-
-    <div class="content" id="mainContent">
-        <h1>Hey Beautiful</h1>
-        <p>I wrote this code because words weren't enough. You make everything a little brighter.</p>
-    </div>
+    <canvas id="heartCanvas"></canvas>
+    <div id="message">Connection Complete</div>
 
     <script>
-        function burst(e) {
-            // Reveal text
-            document.getElementById('mainContent').classList.add('active');
+        const canvas = document.getElementById('heartCanvas');
+        const ctx = canvas.getContext('2d');
+        const msg = document.getElementById('message');
 
-            // Create 10 floating particles on click
-            for (let i = 0; i < 12; i++) {
-                const p = document.createElement('div');
-                p.classList.add('particle');
-                p.innerHTML = '❤';
-                p.style.left = e.clientX + 'px';
-                p.style.top = e.clientY + 'px';
-                p.style.setProperty('--rand', Math.random());
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
-                // Randomize particle size and speed
-                const size = Math.random() * 20 + 10;
-                p.style.fontSize = size + 'px';
+        let points = [];
+        let percent = 0;
+        let speed = 0.3; // Adjust this to make it slower/faster
 
-                document.body.appendChild(p);
+        // Generate the mathematical coordinates for a heart
+        function init() {
+            for (let t = 0; t <= Math.PI * 2; t += 0.05) {
+                // Heart math (Parametric)
+                let x = 16 * Math.pow(Math.sin(t), 3);
+                let y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
 
-                // Cleanup
-                setTimeout(() => p.remove(), 3000);
+                // Scale and center
+                points.push({
+                    x: x * 15 + canvas.width / 2,
+                    y: y * 15 + canvas.height / 2
+                });
             }
         }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.strokeStyle = '#ff3366';
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#ff3366';
+
+            ctx.beginPath();
+
+            let count = Math.floor(points.length * (percent / 100));
+
+            for (let i = 0; i < count; i++) {
+                if (i === 0) {
+                    ctx.moveTo(points[i].x, points[i].y);
+                } else {
+                    ctx.lineTo(points[i].x, points[i].y);
+                }
+            }
+
+            // Draw connecting "searcher" lines while building
+            if (percent < 100) {
+                for (let j = 0; j < count; j += 5) {
+                    ctx.moveTo(points[j].x, points[j].y);
+                    ctx.lineTo(points[count - 1]?.x, points[count - 1]?.y);
+                    ctx.globalAlpha = 0.1;
+                }
+                ctx.stroke();
+                percent += speed;
+            } else {
+                // Heart is finished
+                ctx.globalAlpha = 1;
+                ctx.stroke();
+                ctx.closePath();
+                msg.style.opacity = "1";
+
+                // Final "pulse" effect
+                let pulse = 1 + Math.sin(Date.now() / 200) * 0.03;
+                canvas.style.transform = `scale(${pulse})`;
+            }
+
+            requestAnimationFrame(draw);
+        }
+
+        init();
+        draw();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            points = [];
+            init();
+        });
     </script>
 </body>
 
