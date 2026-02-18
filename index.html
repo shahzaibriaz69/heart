@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For My Favorite Person</title>
+    <style>
+        :root {
+            --primary-color: #ff3366;
+            --secondary-color: #ff85a2;
+            --bg-dark: #0a0a0a;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #1a0a0a 0%, var(--bg-dark) 100%);
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            color: white;
+        }
+
+        /* The Main Heart */
+        .heart-box {
+            position: relative;
+            cursor: pointer;
+            filter: drop-shadow(0 0 20px rgba(255, 51, 102, 0.5));
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .heart-box:hover {
+            transform: scale(1.1);
+        }
+
+        .heart {
+            background-color: var(--primary-color);
+            display: inline-block;
+            height: 100px;
+            position: relative;
+            top: 0;
+            transform: rotate(-45deg);
+            width: 100px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #b3002d 100%);
+            box-shadow: 0 0 40px rgba(255, 51, 102, 0.3);
+            animation: beat 1s infinite alternate;
+        }
+
+        .heart:before,
+        .heart:after {
+            content: "";
+            background: inherit;
+            border-radius: 50%;
+            height: 100px;
+            position: absolute;
+            width: 100px;
+        }
+
+        .heart:before {
+            top: -50px;
+            left: 0;
+        }
+
+        .heart:after {
+            left: 50px;
+            top: 0;
+        }
+
+        @keyframes beat {
+            to {
+                transform: scale(1.1) rotate(-45deg);
+            }
+        }
+
+        /* Floating Particles */
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            color: var(--secondary-color);
+            font-size: 20px;
+            animation: float 3s forwards ease-out;
+            z-index: 10;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-200px) translateX(calc(-50px + 100px * var(--rand))) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* Text Content */
+        .content {
+            margin-top: 100px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1s ease;
+        }
+
+        .content.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #fff, var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: #aaa;
+            max-width: 300px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="heart-box" onclick="burst(event)">
+        <div class="heart"></div>
+    </div>
+
+    <div class="content" id="mainContent">
+        <h1>Hey Beautiful</h1>
+        <p>I wrote this code because words weren't enough. You make everything a little brighter.</p>
+    </div>
+
+    <script>
+        function burst(e) {
+            // Reveal text
+            document.getElementById('mainContent').classList.add('active');
+
+            // Create 10 floating particles on click
+            for (let i = 0; i < 12; i++) {
+                const p = document.createElement('div');
+                p.classList.add('particle');
+                p.innerHTML = '❤';
+                p.style.left = e.clientX + 'px';
+                p.style.top = e.clientY + 'px';
+                p.style.setProperty('--rand', Math.random());
+
+                // Randomize particle size and speed
+                const size = Math.random() * 20 + 10;
+                p.style.fontSize = size + 'px';
+
+                document.body.appendChild(p);
+
+                // Cleanup
+                setTimeout(() => p.remove(), 3000);
+            }
+        }
+    </script>
+</body>
+
+</html>
